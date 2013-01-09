@@ -22,9 +22,9 @@ void testApp::setup(){
 	GUI.addComboBox("combo",  comboVals, &comboVal);
     GUI.addSlider("slider", -2, 2, 0, &sliderVal);
 	GUI.addComboBox("combo",  comboVals, &comboVal);
-    GUI.addTextEntry("textBox", "please enter text here",  100, &enteredText);
+    GUI.addTextEntry("textBox", "please enter text here",  300, &enteredText);
 	GUI.addComboBox("combo",  comboVals, &comboVal);
-	GUI.addButton("go", "press me", &buttonVar);
+	GUI.addButton("press me button", "press me", &buttonVar);
     
     //  doing this in the setup() means the window pops behind.  I do it in update after 1 full frame, so it pops in front. 
     //  GUI.Show();
