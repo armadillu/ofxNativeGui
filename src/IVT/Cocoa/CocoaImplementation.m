@@ -663,8 +663,10 @@ void* CocoaCreateMainWindow(int x, int y, int width, int height, const char *tit
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	NSRect screenRect = [[NSScreen mainScreen] visibleFrame];
 	
-	int style = NSClosableWindowMask | NSTitledWindowMask | NSMiniaturizableWindowMask;
-	NSWindow* win = [[NSWindow alloc] initWithContentRect:NSMakeRect(x, screenRect.size.height - y - height, width, height)
+	int style = NSClosableWindowMask | NSTitledWindowMask | NSMiniaturizableWindowMask | NSResizableWindowMask;
+	float croppedHeight = screenRect.size.height;
+	if (height < croppedHeight) croppedHeight = height;
+	NSWindow* win = [[NSWindow alloc] initWithContentRect:NSMakeRect(x, screenRect.size.height - y - croppedHeight, width, croppedHeight)
 									  styleMask:style
 									  backing:NSBackingStoreBuffered
 									  defer:NO];
@@ -691,10 +693,45 @@ void* CocoaCreateMainWindow(int x, int y, int width, int height, const char *tit
 	//int nOpenWindows = [delegate numberOfOpenWindows];
 	//nOpenWindows++;
 	//[delegate setNumberOfOpenWindows: nOpenWindows];
+
+	NSView* view = [win contentView];
+
+	NSScrollView *scrollView = [[NSScrollView alloc] initWithFrame: NSInsetRect( NSMakeRect(0, 0, width, croppedHeight), 0, 0)  ];
+	[scrollView setAutoresizingMask: NSViewMaxXMargin | NSViewMinXMargin| NSViewMinYMargin | NSViewMaxYMargin | NSViewHeightSizable | NSViewWidthSizable];
+	[scrollView setAutohidesScrollers:YES];
 	
+	// configure the scroll view
+	[scrollView setBorderType:NSNoBorder]; //NSLineBorder
+	[scrollView setHasVerticalScroller:YES];
+	//[scrollView setBackgroundColor: [NSColor colorWithCalibratedRed:1 green:0 blue:0 alpha:0.5]];
+
+
+	NSView * widgetsView = [[NSView alloc] initWithFrame: NSMakeRect(0, 0, width, height)];
+	//widgetsView.translatesAutoresizingMaskIntoConstraints = NO;
+	[widgetsView setAutoresizingMask: NSViewMaxXMargin | NSViewMinYMargin | NSViewHeightSizable | NSViewWidthSizable];
+	// embed your custom view in the scroll view
+	[scrollView setDocumentView:widgetsView];
+	NSRect r = [widgetsView frame];
+	[scrollView.documentView setFrame: r];
+
+	[scrollView.contentView scrollToPoint:NSMakePoint(0, widgetsView.frame.size.height)];
+
+	// set the scroll view as the content view of your window
+	[view addSubview:scrollView];
+	NSLog(@"scroll %@",NSStringFromRect(scrollView.frame));
+	NSLog(@"widgetsView %@",NSStringFromRect(widgetsView.frame));
+
+	//[win setBackgroundColor:[NSColor greenColor]];
+
   [pool release];
 	return myWin;
 }
+
+//feed it the immediate view in the window to get access to the contents of the scrollview
+NSView * getWidgetView( NSView * mainWindowView){
+	return [[[mainWindowView subviews] objectAtIndex:0] documentView];
+}
+
 
 void CocoaDestroyMainWindow(void* window)
 {
@@ -725,8 +762,9 @@ void* CocoaCreateImage(void* window, int x, int y, int width, int height, void* 
 		
 		[image setTarget: myWin];
 		[image setAction: @selector(eventNotify:)];
-		[view addSubview: image];
-		
+		[getWidgetView(view) addSubview: image];
+		[image setAutoresizingMask: NSViewMaxXMargin | NSViewMinYMargin ];
+
 		NSBitmapImageRep *bmp = [[NSBitmapImageRep alloc]	initWithBitmapDataPlanes: NULL
 															pixelsWide: width
 															pixelsHigh: height
@@ -780,7 +818,9 @@ void* CocoaCreateButton(void* window, int x, int y, int width, int height, const
 		
 		[newButton setTarget: myWin];
 		[newButton setAction: @selector(eventNotify:)];
-		[view addSubview: newButton];
+		[getWidgetView(view) addSubview: newButton];
+		[newButton setAutoresizingMask: NSViewMaxXMargin | NSViewMinYMargin | NSViewWidthSizable ];
+
 		
     [str release];
     [pool release];
@@ -812,7 +852,9 @@ void* CocoaCreateLabel(void* window, int x, int y, int width, int height, const 
 		NSString* str = [[NSString alloc] initWithCString: text encoding: NSASCIIStringEncoding];
 		[label setStringValue: str];
 		
-		[view addSubview: label];
+		[getWidgetView(view) addSubview: label];
+		[label setAutoresizingMask: NSViewMinXMargin | NSViewMinYMargin ];
+
 		
     [str release];
     [pool release];
@@ -846,7 +888,8 @@ void* CocoaCreateCheckBox(void* window, int x, int y, int width, int height, con
 		
 		[newButton setTarget: myWin];
 		[newButton setAction: @selector(eventNotify:)];
-		[view addSubview: newButton];
+		[newButton setAutoresizingMask: NSViewMaxXMargin | NSViewMinYMargin ];
+		[getWidgetView(view) addSubview: newButton];
 		
     [str release];
     [pool release];
@@ -879,7 +922,8 @@ void* CocoaCreateTextEdit(void* window, int x, int y, int width, int height, con
 		
 		[textEdit setTarget: myWin];
 		[textEdit setAction: @selector(eventNotify:)];
-		[view addSubview: textEdit];
+		[textEdit setAutoresizingMask: NSViewMaxXMargin | NSViewMinYMargin | NSViewWidthSizable ];
+		[getWidgetView(view) addSubview: textEdit];
 		
     [str release];
     [pool release];
@@ -889,6 +933,8 @@ void* CocoaCreateTextEdit(void* window, int x, int y, int width, int height, con
   [pool release];
 	return NULL;
 }
+
+
 
 void* CocoaCreateSlider(void* window, int x, int y, int width, int height, int min_value, int max_value, int step, int value, void* ptr) {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -914,9 +960,15 @@ void* CocoaCreateSlider(void* window, int x, int y, int width, int height, int m
 		
 		[slider setTarget: myWin];
 		[slider setAction: @selector(eventNotify:)];
-		[view addSubview: slider];
-		
-    [pool release];
+		[slider setAutoresizingMask:  NSViewMinYMargin | NSViewWidthSizable ];
+		NSView * widgetView = getWidgetView(view);
+		[widgetView addSubview: slider];
+		//NSRect f = [widgetView frame];
+		//f.size.height = fabs(slider.frame.size.height ) + fabs(slider.frame.origin.y);
+		//printf("create at y: %d\n", y);
+		//[widgetView setFrame: f ];
+
+		[pool release];
 		return slider;
 	}
 	
@@ -947,7 +999,10 @@ void* CocoaCreateComboBox(void* window, int x, int y, int width, int height, int
 		
 		[comboBox setTarget: myWin];
 		[comboBox setAction: @selector(eventNotify:)];
-		[view addSubview: comboBox];
+		[getWidgetView(view) addSubview: comboBox];
+		[comboBox setAutoresizingMask:  NSViewMinYMargin | NSViewWidthSizable ];
+
+
 		
     [pool release];
 		return comboBox;
@@ -979,7 +1034,7 @@ void* CocoaCreateOpenGLWidget(void* window, int x, int y, int width, int height,
 	
 	MyOpenGLView* ogl = [[MyOpenGLView alloc] initWithFrame: NSMakeRect(x, y, width, height) pixelFormat: pixFmt];
 	if (ogl != nil) {		
-		[view addSubview: ogl];
+		[getWidgetView(view) addSubview: ogl];
 		
 		NSOpenGLContext *context = [ogl openGLContext];
 		[context makeCurrentContext];

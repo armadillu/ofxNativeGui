@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxNativeGui.h"
+#include "ofxNativeGuiAutoLayout.h"
 
 class testApp : public ofBaseApp, public ofxNativeGuiEventInterface {
 
@@ -24,12 +24,13 @@ class testApp : public ofBaseApp, public ofxNativeGuiEventInterface {
         vector < string > comboVals;
     
     	// the gui window. 
-        ofxNativeGui GUI;
+        ofxNativeGuiAutoLayout GUI;
         
         // these variables are passed into the gui, and get altered as the gui is altered: 
         int comboVal;
         float sliderVal;
         string enteredText;
+		bool buttonVar;
     
         void guiEvent(nativeWidget & widget);
     

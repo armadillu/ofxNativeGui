@@ -18,7 +18,7 @@ void ofxNativeGui::hide(){  CMW->Hide(); }
 void ofxNativeGui::addSlider(string name, ofRectangle bounds, float minValue, float maxValue, float startValue, float * variable){  
     
     float pct = ofMap(startValue, minValue, maxValue, 0,1);
-    nativeWidget * guiElement = new nativeSliderWidget();;
+    nativeWidget * guiElement = new nativeSliderWidget();
     guiElement->widget = CMW->AddSlider(bounds.x, bounds.y, bounds.width, bounds.height,  0, 1000, 50, 1000*pct);
     guiElement->type = eSlider;
     guiElement->name = name;

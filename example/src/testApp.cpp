@@ -13,13 +13,18 @@ void testApp::setup(){
     enteredText = "no entered text yet";
     // --------------- setup the gui window
     
-    GUI.setup(ofRectangle(0,0,300,300), "my sample gui");
-    
+    GUI.setup("my sample gui", 300, 300);
+
     GUI.setEventInterface(this);
     
-    GUI.addComboBox("combo", ofRectangle(10, 50, 100, 30), comboVals, &comboVal);
-    GUI.addSlider("slider", ofRectangle(10, 90, 180, 20), -2, 2, 0, &sliderVal);
-    GUI.addTextEntry("textBox", "please enter text here", ofRectangle(10,120,180,100), &enteredText);
+    GUI.addComboBox("combo",  comboVals, &comboVal);
+    GUI.addSlider("slider", -2, 2, 0, &sliderVal);
+	GUI.addComboBox("combo",  comboVals, &comboVal);
+    GUI.addSlider("slider", -2, 2, 0, &sliderVal);
+	GUI.addComboBox("combo",  comboVals, &comboVal);
+    GUI.addTextEntry("textBox", "please enter text here",  100, &enteredText);
+	GUI.addComboBox("combo",  comboVals, &comboVal);
+	GUI.addButton("go", "press me", &buttonVar);
     
     //  doing this in the setup() means the window pops behind.  I do it in update after 1 full frame, so it pops in front. 
     //  GUI.Show();
