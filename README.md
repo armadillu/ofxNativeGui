@@ -23,8 +23,8 @@ Oriol's modifications
 =====================
 
 * automatic layout: just add widgets in order and they will be laid out below the last one. no need to be calculating bound rects.
-* scrolling: too many sliders to fit in a window? just scroll!
-* resizing: need more precision on the sliders? just make the window wider!
-* modding osx only!
+* scrolling: too many sliders to fit inside a window? just scroll down to see more!
+* window resizing: need more precision on the sliders? just make the window wider!
+* ony modding the osx stuff!
 
-todo: somehow grow scrollview docview dyanimcally!
+todo: somehow grow scrollview docview dyanimcally
