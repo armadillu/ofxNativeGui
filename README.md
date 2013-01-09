@@ -17,3 +17,14 @@ To do:
 * getters and setters for gui objects (set value, get value, etc)
 * hiding and showing of the main window is a bit funky.  Some code that lets you focus the gui would be good (it pops up behind, can get closed, etc)
 * combo box add selected item option
+
+
+Oriol's modifications
+=====================
+
+automatic layout: just add widgets in order and they will be laid out below the last one.
+scrolling: too many sliders to fit in a window? just scroll!
+resizing: need more precision on the sliders? just make the window wider!
+modding osx only!
+
+todo: somehow grow scrollview docview dyanimcally!
