@@ -25,6 +25,7 @@ public:
 	}
 
 	void addSlider(string name, float minValue, float maxValue, float startValue, float * variable){
+		*variable = startValue;
 		ofRectangle r;
 		r.x = margin;
 		r.height = getHeightForWidget(SLIDER);
